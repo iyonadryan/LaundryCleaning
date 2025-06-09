@@ -53,5 +53,5 @@ CodeCoverage/
 TestResult.xml
 nunit-*.xml
 
-# Secrets
-secrets.json
+## ASP.NET / EF Core
+appsettings.json
