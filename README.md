@@ -36,7 +36,21 @@ Project ini merupakan backend **trial & error** yang dibuat untuk eksperimen dan
    ```
 3. -soon
 
+## 🍫 GraphQL API dengan HotChocolate
+Proyek ini menggunakan [HotChocolate](https://chillicream.com/docs/hotchocolate/v15) sebagai implementasi GraphQL di ASP.NET Core. <br />
+Setelah aplikasi dijalankan, kamu dapat mengakses GraphQL Playground melalui browser:
+```bash
+http://localhost:5292/graphql
+```
+> 🔍 Akses Playground (Banana Cake Pop)
+> 
+> Tampilan UI default dari HotChocolate disebut Banana Cake Pop, yang menyediakan antarmuka interaktif untuk menulis, menguji, dan mendokumentasikan query/mutation GraphQL.
 
+## 📘 Dokumentasi Otomatis
+Playground ini juga menampilkan Schema Docs secara otomatis dari GraphQL server:
+- Menjelaskan semua jenis (type), Query, Mutation, dan InputType
+- Menunjukkan relasi antar field dan argumen
+- Berguna untuk eksplorasi API tanpa dokumentasi manual tambahan
 
 ## 📁 Struktur Umum
 
