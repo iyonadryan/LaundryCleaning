@@ -16,21 +16,24 @@ Project ini merupakan backend **trial & error** yang dibuat untuk eksperimen dan
 
 ## ⚙️ Konfigurasi Awal
 1. **Salin file konfigurasi:**
+   ```bash
    Dari: appsettings-example.json
    Menjadi : appsettings.json
+   ```
 2. **Edit bagian berikut sesuai kebutuhan proyek:**
-Pastikan DefaultConnection sesuai dengan konfigurasi database Anda, dan JwtSettings disesuaikan dengan mekanisme autentikasi JWT yang digunakan.
-  ```json
-  "ConnectionStrings": {
+   
+   Pastikan DefaultConnection sesuai dengan konfigurasi database Anda, dan JwtSettings disesuaikan dengan mekanisme autentikasi JWT yang digunakan.
+   ```json
+   "ConnectionStrings": {
     "DefaultConnection": "Server=.;Database=YourDatabaseName;Trusted_Connection=True;"
-  },
-  "JwtSettings": {
+   },
+   "JwtSettings": {
     "Key": "your-secret-key",
     "Issuer": "your-app",
     "Audience": "your-app",
     "ExpireMinutes": 60
-  }
-  ```
+   }
+   ```
 3. -soon
 
 
