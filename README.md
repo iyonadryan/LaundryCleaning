@@ -1,4 +1,4 @@
-# LaundryCleaning Backend (Trial Error)
+# Laundry & Cleaning Service Management Backend API
 
 Project ini merupakan backend **trial & error** yang dibuat untuk eksperimen dan pembelajaran dalam pengembangan aplikasi backend menggunakan teknologi modern dari Microsoft dan GraphQL.
 
@@ -22,7 +22,7 @@ Project ini merupakan backend **trial & error** yang dibuat untuk eksperimen dan
    ```
 2. **Edit bagian berikut sesuai kebutuhan proyek:**
    
-   Pastikan DefaultConnection sesuai dengan konfigurasi database Anda, dan JwtSettings disesuaikan dengan mekanisme autentikasi JWT yang digunakan.
+   Pastikan DefaultConnection sesuai dengan konfigurasi database, dan JwtSettings disesuaikan dengan mekanisme autentikasi JWT yang digunakan.
    ```json
    "ConnectionStrings": {
     "DefaultConnection": "Server=.;Database=YourDatabaseName;Trusted_Connection=True;"
