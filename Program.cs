@@ -53,6 +53,7 @@ builder.Services
     .AddQueryType(d => d.Name(ExtendObjectTypeConstants.Query))
     .AddMutationType(d => d.Name(ExtendObjectTypeConstants.Mutation))
     .AddSubscriptionType(d => d.Name(ExtendObjectTypeConstants.Subscription))
+    .AddType<UploadType>()
     .AddTypeExtensionsFromAssembly(Assembly.GetExecutingAssembly())
     .AddErrorFilter<BusinessErrorFilter>();
 
@@ -71,6 +72,8 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 
 var app = builder.Build();
+
+app.UseStaticFiles();
 
 app.UseAuthentication(); 
 app.UseAuthorization();

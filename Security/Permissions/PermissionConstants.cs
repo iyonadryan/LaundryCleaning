@@ -5,6 +5,8 @@ namespace LaundryCleaning.Security.Permissions
     public class PermissionConstants
     {
         #region Business Permissions
+        public const string FileUpload = "File:Upload";
+
         public const string UserManage = "User:Manage";
         public const string UserView = "User:View";
 
@@ -13,6 +15,7 @@ namespace LaundryCleaning.Security.Permissions
 
         public static readonly List<string> AllPermission = new()
         {
+            FileUpload,
             UserManage,
             UserView,
             RoleManage

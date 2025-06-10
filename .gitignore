@@ -55,3 +55,6 @@ nunit-*.xml
 
 ## ASP.NET / EF Core
 appsettings.json
+
+## Public Upload
+wwwroot/Uploads
