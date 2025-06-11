@@ -1,6 +1,7 @@
 ﻿using HotChocolate.Subscriptions;
 using LaundryCleaning.Auth.Services.Implementations;
 using LaundryCleaning.Auth.Services.Interfaces;
+using LaundryCleaning.Download;
 using LaundryCleaning.GraphQL.Files.Services.Implementations;
 using LaundryCleaning.GraphQL.Files.Services.Interfaces;
 using LaundryCleaning.GraphQL.Roles.Services.Implementations;
@@ -19,9 +20,10 @@ namespace LaundryCleaning.Extensions
         {
             services.AddScoped<IPasswordHasher<object>, PasswordHasher<object>>();
             services.AddScoped<IPasswordService, PasswordService>();
+            services.AddSingleton<SecureDownloadHelper>();
 
             services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<IFileUploadService, FileUploadService>();
+            services.AddScoped<IFileService, FileService>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IUserService, UserService>();
 

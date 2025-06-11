@@ -7,6 +7,7 @@ using LaundryCleaning.Common.Constants;
 using LaundryCleaning.Common.Filters;
 using LaundryCleaning.Common.Middleware;
 using LaundryCleaning.Data;
+using LaundryCleaning.Download;
 using LaundryCleaning.Extensions;
 using LaundryCleaning.Security;
 using LaundryCleaning.Security.Permissions;
@@ -79,6 +80,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapLogin(); // endpoint login
+app.MapDownloadEndpoint(); // endpoint download
 
 app.UseWebSockets();
 

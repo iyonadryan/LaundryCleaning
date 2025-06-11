@@ -8,17 +8,28 @@ using LaundryCleaning.Security.Permissions;
 namespace LaundryCleaning.GraphQL.Files.Mutations
 {
     [ExtendObjectType(ExtendObjectTypeConstants.Mutation)]
-    public class FileUploadMutations
+    public class FileMutations
     {
         [RequirePermission(PermissionConstants.FileUpload)]
         [GraphQLName("uploadFile")]
         [GraphQLDescription("Upload File.")]
         public async Task<GlobalUploadFileResponseCustomModel> UploadFile(
             GlobalUploadFileInput input,
-            [Service] IFileUploadService service,
+            [Service] IFileService service,
             CancellationToken cancellationToken)
         {
             return await service.UploadFile(input, cancellationToken);
+
+        }
+
+        [RequirePermission(PermissionConstants.FileUpload)]
+        [GraphQLName("generateExcelFile")]
+        [GraphQLDescription("Generate Excel File.")]
+        public async Task<GlobalUploadFileResponseCustomModel> GenerateExcelFile(
+            [Service] IFileService service,
+            CancellationToken cancellationToken)
+        {
+            return await service.GenerateExcelFile(cancellationToken);
 
         }
     }
