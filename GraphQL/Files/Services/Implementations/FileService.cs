@@ -109,6 +109,33 @@ namespace LaundryCleaning.GraphQL.Files.Services.Implementations
             };
         }
 
+        public async Task<List<List<string>>> UploadExcelAndReadRows(GlobalUploadFileInput input, CancellationToken cancellationToken)
+        {
+            // Simpan ke memori (tidak perlu disimpan ke disk jika hanya membaca)
+            using var stream = input.File.OpenReadStream();
+
+            var workbook = new XSSFWorkbook(stream);
+            var sheet = workbook.GetSheetAt(0); // Ambil sheet pertama
+            var rows = new List<List<string>>();
+
+            for (int i = sheet.FirstRowNum; i <= sheet.LastRowNum; i++)
+            {
+                var row = sheet.GetRow(i);
+                if (row == null) continue;
+
+                var rowData = new List<string>();
+                for (int j = 0; j < row.LastCellNum; j++)
+                {
+                    var cell = row.GetCell(j);
+                    rowData.Add(cell?.ToString() ?? string.Empty);
+                }
+
+                rows.Add(rowData);
+            }
+
+            return rows;
+        }
+
         private static string GenerateRandomString(int length)
         {
             const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

@@ -32,5 +32,16 @@ namespace LaundryCleaning.GraphQL.Files.Mutations
             return await service.GenerateExcelFile(cancellationToken);
 
         }
+
+        [RequirePermission(PermissionConstants.FileUpload)]
+        [GraphQLName("uploadExcelAndReadRows")]
+        [GraphQLDescription("Upload Excel And Read Rows.")]
+        public async Task<List<List<string>>> UploadExcelAndReadRows(
+            GlobalUploadFileInput input,
+            [Service] IFileService service,
+            CancellationToken cancellationToken)
+        {
+            return await service.UploadExcelAndReadRows(input, cancellationToken);
+        }
     }
 }
