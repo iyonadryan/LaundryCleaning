@@ -20,18 +20,23 @@ namespace LaundryCleaning.Extensions
     {
         public static IServiceCollection AddProjectServices(this IServiceCollection services)
         {
+            #region Services
+            services.AddScoped<IInvoiceNumberService, InvoiceNumberService>();
             services.AddScoped<IPasswordHasher<object>, PasswordHasher<object>>();
             services.AddScoped<IPasswordService, PasswordService>();
             services.AddSingleton<SecureDownloadHelper>();
+            #endregion
 
             var context = new CustomAssemblyLoadContext();
             context.LoadUnmanagedLibrary(System.IO.Path.Combine(Directory.GetCurrentDirectory(), "Storages", "Lib", "libwkhtmltox", "libwkhtmltox.dll"));
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 
+            #region GraphQL Services
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IUserService, UserService>();
+            #endregion
 
             return services;
         }

@@ -18,10 +18,13 @@ namespace LaundryCleaning.Data
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public DbSet<Identity> Identities => Set<Identity>(); 
+        #region Entity
+        public DbSet<Identity> Identities => Set<Identity>();
+        public DbSet<InvoiceNumberTracker> InvoiceNumberTrackers => Set<InvoiceNumberTracker>();
         public DbSet<Role> Roles => Set<Role>();
         public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
         public DbSet<User> Users => Set<User>();
+        #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -30,6 +33,7 @@ namespace LaundryCleaning.Data
 
             #region Entity Builder
             new IdentityBuilder(this).Configure(modelBuilder.Entity<Identity>());
+            new InvoiceNumberTrackerBuilder(this).Configure(modelBuilder.Entity<InvoiceNumberTracker>());
             new RoleBuilder(this).Configure(modelBuilder.Entity<Role>());
             new RolePermissionBuilder(this).Configure(modelBuilder.Entity<RolePermission>());
             new UserBuilder(this).Configure(modelBuilder.Entity<User>());

@@ -7,6 +7,7 @@ using LaundryCleaning.Data;
 using LaundryCleaning.Download;
 using LaundryCleaning.GraphQL.Files.Services.Interfaces;
 using LaundryCleaning.GraphQL.Users.Services.Implementations;
+using LaundryCleaning.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using NPOI.HPSF;
@@ -24,18 +25,21 @@ namespace LaundryCleaning.GraphQL.Files.Services.Implementations
         private readonly ILogger<FileService> _logger;
         private readonly SecureDownloadHelper _secureDownloadHelper;
         private readonly IConverter _converter;
+        private readonly IInvoiceNumberService _invoiceNumberService;
         public FileService(
             ApplicationDbContext dbContext
             ,IHttpContextAccessor httpContextAccessor
             ,ILogger<FileService> logger
             ,SecureDownloadHelper secureDownloadHelper
-            ,IConverter converter) 
+            ,IConverter converter
+            ,IInvoiceNumberService invoiceNumberService) 
         {
             _dbContext = dbContext;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
             _secureDownloadHelper = secureDownloadHelper;
             _converter = converter;
+            _invoiceNumberService = invoiceNumberService;
         }
 
         public async Task<GlobalUploadFileResponseCustomModel> UploadFile(GlobalUploadFileInput input, CancellationToken cancellationToken)
@@ -182,13 +186,12 @@ namespace LaundryCleaning.GraphQL.Files.Services.Implementations
 
             decimal invoiceTax = (subTotal * 12) / 100;
 
-            Random codeRandom = new Random();
-            int codeNumber = codeRandom.Next(100, 300);
+            var invoiceNumber = await _invoiceNumberService.GenerateInvoiceNumberAsync("ABCDE", cancellationToken);
 
             var invoice = new InvoiceModel()
             { 
                 Logo = "http://localhost:5292/Logo/IYON_LOGO_black.png",
-                InvoiceNumber = codeNumber.ToString(),
+                InvoiceNumber = invoiceNumber,
                 InvoiceDate = DateTime.Now,
                 InvoicePaymentDueDate = DateTime.Now.AddMonths(1),
                 Items = items,
@@ -225,10 +228,7 @@ namespace LaundryCleaning.GraphQL.Files.Services.Implementations
 
             string invoiceFolder = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "Storages", "Invoices");
 
-            var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            var randomCode = GenerateRandomString(10);
-            string fileName = $"invoice_{timestamp}_{randomCode}.pdf";
-
+            string fileName = $"{invoiceNumber}.pdf";
             string filePath = System.IO.Path.Combine(invoiceFolder, fileName);
 
             // Buat folder jika belum ada
