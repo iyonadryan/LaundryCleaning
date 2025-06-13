@@ -43,5 +43,16 @@ namespace LaundryCleaning.GraphQL.Files.Mutations
         {
             return await service.UploadExcelAndReadRows(input, cancellationToken);
         }
+
+        [RequirePermission(PermissionConstants.FileUpload)]
+        [GraphQLName("generateInvoice")]
+        [GraphQLDescription("Generate Invoice.")]
+        public async Task<GlobalUploadFileResponseCustomModel> GenerateInvoice(
+            [Service] IFileService service,
+            CancellationToken cancellationToken)
+        {
+            return await service.GenerateInvoice(cancellationToken);
+
+        }
     }
 }

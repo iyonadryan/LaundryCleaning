@@ -18,7 +18,22 @@ namespace LaundryCleaning.Download
 
                 var contentType = GetContentType(fileName);
                 var fileBytes = await File.ReadAllBytesAsync(filePath);
-                return Results.File(fileBytes, contentType, fileName);
+                return Results.File(fileBytes, contentType, System.IO.Path.GetFileName(fileName));
+            });
+
+            app.MapGet("/download-invoice", async (HttpContext context, [FromQuery] string token, [FromServices] SecureDownloadHelper helper) =>
+            {
+                if (!helper.TryValidateToken(token, out var fileName))
+                    return Results.BadRequest("Invalid or expired token.");
+
+                var storagePath = System.IO.Path.Combine("Storages", "Invoices");
+                var filePath = System.IO.Path.Combine(storagePath, fileName);
+                if (!File.Exists(filePath))
+                    return Results.NotFound("File not found.");
+
+                var contentType = GetContentType(fileName);
+                var fileBytes = await File.ReadAllBytesAsync(filePath);
+                return Results.File(fileBytes, contentType, System.IO.Path.GetFileName(fileName));
             });
         }
 

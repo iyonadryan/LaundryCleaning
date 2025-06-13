@@ -1,4 +1,6 @@
-﻿using HotChocolate.Subscriptions;
+﻿using DinkToPdf;
+using DinkToPdf.Contracts;
+using HotChocolate.Subscriptions;
 using LaundryCleaning.Auth.Services.Implementations;
 using LaundryCleaning.Auth.Services.Interfaces;
 using LaundryCleaning.Download;
@@ -21,6 +23,10 @@ namespace LaundryCleaning.Extensions
             services.AddScoped<IPasswordHasher<object>, PasswordHasher<object>>();
             services.AddScoped<IPasswordService, PasswordService>();
             services.AddSingleton<SecureDownloadHelper>();
+
+            var context = new CustomAssemblyLoadContext();
+            context.LoadUnmanagedLibrary(System.IO.Path.Combine(Directory.GetCurrentDirectory(), "Storages", "Lib", "libwkhtmltox", "libwkhtmltox.dll"));
+            services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IFileService, FileService>();

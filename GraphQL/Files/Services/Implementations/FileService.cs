@@ -1,4 +1,7 @@
-﻿using LaundryCleaning.Common.Inputs;
+﻿using DinkToPdf;
+using DinkToPdf.Contracts;
+using LaundryCleaning.Common.Inputs;
+using LaundryCleaning.Common.Models;
 using LaundryCleaning.Common.Response;
 using LaundryCleaning.Data;
 using LaundryCleaning.Download;
@@ -8,6 +11,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using NPOI.HPSF;
 using NPOI.XSSF.UserModel;
+using RazorLight;
+using System;
+using System.Text;
 
 namespace LaundryCleaning.GraphQL.Files.Services.Implementations
 {
@@ -17,16 +23,19 @@ namespace LaundryCleaning.GraphQL.Files.Services.Implementations
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<FileService> _logger;
         private readonly SecureDownloadHelper _secureDownloadHelper;
+        private readonly IConverter _converter;
         public FileService(
             ApplicationDbContext dbContext
             ,IHttpContextAccessor httpContextAccessor
             ,ILogger<FileService> logger
-            ,SecureDownloadHelper secureDownloadHelper) 
+            ,SecureDownloadHelper secureDownloadHelper
+            ,IConverter converter) 
         {
             _dbContext = dbContext;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
             _secureDownloadHelper = secureDownloadHelper;
+            _converter = converter;
         }
 
         public async Task<GlobalUploadFileResponseCustomModel> UploadFile(GlobalUploadFileInput input, CancellationToken cancellationToken)
@@ -134,6 +143,111 @@ namespace LaundryCleaning.GraphQL.Files.Services.Implementations
             }
 
             return rows;
+        }
+
+        public async Task<GlobalUploadFileResponseCustomModel> GenerateInvoice(CancellationToken cancellationToken)
+        {
+            string folderTemplatePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "Storages", "Templates");
+
+            var engine = new RazorLightEngineBuilder()
+                .UseFileSystemProject(folderTemplatePath)
+                .UseMemoryCachingProvider()
+                .Build();
+
+            var data = await (from u in _dbContext.Users
+                              select u).Take(5).ToListAsync(cancellationToken);
+            
+            decimal subTotal = 0;
+
+            var items = new List<InvoiceItem>();
+            foreach (var row in data)
+            {
+                decimal price = 100000;
+
+                Random random = new Random();
+                int number = random.Next(1, 4);
+
+                var newItem = new InvoiceItem()
+                { 
+                    Description = row.Username,
+                    Quantity = number,
+                    UnitPrice = price,
+                    TotalPrice = price * number
+                };
+
+                items.Add(newItem);
+
+                subTotal = subTotal + (price * number);
+            }
+
+            decimal invoiceTax = (subTotal * 12) / 100;
+
+            Random codeRandom = new Random();
+            int codeNumber = codeRandom.Next(100, 300);
+
+            var invoice = new InvoiceModel()
+            { 
+                Logo = "http://localhost:5292/Logo/IYON_LOGO_black.png",
+                InvoiceNumber = codeNumber.ToString(),
+                InvoiceDate = DateTime.Now,
+                InvoicePaymentDueDate = DateTime.Now.AddMonths(1),
+                Items = items,
+                SubTotal = subTotal,
+                InvoiceTax = invoiceTax,
+                Total = subTotal + invoiceTax,
+                PaymentDetail = new InvoicePaymentDetail() 
+                { 
+                    BankName = "Bank Central Asia (BCA)",
+                    BankAccountNumber = "1234567890",
+                    BankAccountName = "PT IYON",
+                    BankVirtualAccount= "8810 1234 5678 9012"
+                }
+            };
+
+            var htmlContent = await engine.CompileRenderAsync("invoice-template.cshtml", invoice);
+
+            // Convert to PDF
+            var pdfDoc = new HtmlToPdfDocument()
+            {
+                GlobalSettings = {
+                ColorMode = ColorMode.Color,
+                Orientation = Orientation.Portrait,
+                PaperSize = PaperKind.A4
+            },
+                        Objects = {
+                new ObjectSettings() {
+                    HtmlContent = htmlContent
+                }
+            }
+            };
+
+            var pdf = _converter.Convert(pdfDoc);
+
+            string invoiceFolder = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "Storages", "Invoices");
+
+            var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            var randomCode = GenerateRandomString(10);
+            string fileName = $"invoice_{timestamp}_{randomCode}.pdf";
+
+            string filePath = System.IO.Path.Combine(invoiceFolder, fileName);
+
+            // Buat folder jika belum ada
+            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filePath)!);
+
+            // Simpan file PDF ke folder temp
+            System.IO.File.WriteAllBytes(filePath, pdf);
+
+            var token = _secureDownloadHelper.GenerateToken(filePath, TimeSpan.FromMinutes(5));
+
+            var request = _httpContextAccessor.HttpContext!.Request;
+            var baseUrl = $"{request.Scheme}://{request.Host}";
+            var url = $"{baseUrl}/download-invoice?token={Uri.EscapeDataString(token)}";
+
+            return new GlobalUploadFileResponseCustomModel()
+            {
+                Success = true,
+                Url = url
+            };
         }
 
         private static string GenerateRandomString(int length)
