@@ -19,16 +19,15 @@ namespace LaundryCleaning.Data
         public void SeedAll()
         {
             var dataSeeder = new GenericDataSeeder(_context);
-            dataSeeder.SeedFromData();
-
             var csvSeeder = new GenericCsvSeeder(_context);
-            #region Data Seeder From csv
+
             csvSeeder.SeedFromCsv<User>(System.IO.Path.Combine("Data", "DataSeeder", "users.csv"));
-            csvSeeder.SeedFromCsv<RolePermission>(System.IO.Path.Combine("Data", "DataSeeder", "rolePermissions.csv"));
-            #endregion
+            dataSeeder.SeedFromData();
 
             var iTTeamDataSeeder = new ITTeamData(_context, _passwordService);
             iTTeamDataSeeder.AddData();
+            
+            csvSeeder.SeedFromCsv<RolePermission>(System.IO.Path.Combine("Data", "DataSeeder", "rolePermissions.csv"));
         }
     }
 }

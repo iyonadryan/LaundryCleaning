@@ -1,4 +1,5 @@
 ﻿using LaundryCleaning.Common.Exceptions;
+using Serilog;
 
 namespace LaundryCleaning.Common.Filters
 {
@@ -15,6 +16,7 @@ namespace LaundryCleaning.Common.Filters
             if (error.Exception is BusinessLogicException ex)
             {
                 _logger.LogWarning("Business logic error: {Message}", ex.Message);
+                Log.Error("Business logic error: {Message}", ex.Message);
 
                 return ErrorBuilder.New()
                     .SetMessage(ex.Message)

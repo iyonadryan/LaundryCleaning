@@ -3,6 +3,7 @@ using DinkToPdf.Contracts;
 using HotChocolate.Subscriptions;
 using LaundryCleaning.Auth.Services.Implementations;
 using LaundryCleaning.Auth.Services.Interfaces;
+using LaundryCleaning.Data;
 using LaundryCleaning.Download;
 using LaundryCleaning.GraphQL.Files.Services.Implementations;
 using LaundryCleaning.GraphQL.Files.Services.Interfaces;
@@ -21,6 +22,7 @@ namespace LaundryCleaning.Extensions
         public static IServiceCollection AddProjectServices(this IServiceCollection services)
         {
             #region Services
+            services.AddScoped<DatabaseSeeder>();
             services.AddScoped<IInvoiceNumberService, InvoiceNumberService>();
             services.AddScoped<IPasswordHasher<object>, PasswordHasher<object>>();
             services.AddScoped<IPasswordService, PasswordService>();

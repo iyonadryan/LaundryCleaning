@@ -69,10 +69,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddProjectServices();
 
+var seqSettings = builder.Configuration.GetSection("SeqSettings");
+var seqSecretKey = seqSettings["SecretKey"];
+
 Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
     .Enrich.FromLogContext()
     .WriteTo.Console()
-    .WriteTo.Seq("http://localhost:5341") // URL Seq server
+    .WriteTo.Seq("http://localhost:5341", apiKey: seqSecretKey)
     .CreateLogger();
 
 builder.Host.UseSerilog();
@@ -97,6 +101,15 @@ using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
 
 var dbContext = services.GetRequiredService<ApplicationDbContext>();
+if (dbContext.Database.GetDbConnection().Database != null)
+{
+    Console.WriteLine("🔍 Check database...");
+}
+
+// 'dotnet ef database update'
+dbContext.Database.Migrate();
+Console.WriteLine("✅ Migration done / up-to-date");
+
 var passwordService = services.GetRequiredService<IPasswordService>();
 var seeder = new DatabaseSeeder(dbContext, passwordService);
 

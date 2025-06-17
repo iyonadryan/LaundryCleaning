@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "IY0N@Passw0rd!"
+    volumes:
+      - sql_data:/var/opt/mssql
+    networks:
+      - backend
+
+  seq:
+    image: datalust/seq:latest
+    container_name: seq
+    ports:
+      - "5341:80"  # default web UI port
+      - "5342:5341"  # ingestion API (if needed separately)
+    environment:
+      ACCEPT_EULA: "Y"
+      SEQ_API_KEY: "Fhb5CbMGFl9lPJTNbJfyzjAvoPwcl1"
+    volumes:
+      - seq_data:/data
+    networks:
+      - backend
+
+networks:
+  backend:
+
+volumes:
+  sql_data:
+  seq_data:
