@@ -1,8 +1,12 @@
 ﻿using Confluent.Kafka;
 using HotChocolate.Subscriptions;
+using LaundryCleaning.Common.Exceptions;
+using LaundryCleaning.Common.Models.Entities;
 using LaundryCleaning.Data;
+using LaundryCleaning.Services.Dispatcher;
 using LaundryCleaning.Services.Implementations;
 using Microsoft.EntityFrameworkCore;
+using NPOI.XWPF.UserModel;
 
 namespace LaundryCleaning.Services.Background
 {
@@ -35,10 +39,11 @@ namespace LaundryCleaning.Services.Background
 
             _consumer = new ConsumerBuilder<Ignore, string>(config).Build();
 
-            // Initial topic load
             using var scope = _scopeFactory.CreateScope();
             var _dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var _dispatcher = scope.ServiceProvider.GetRequiredService<SystemMessageDispatcher>();
 
+            // Initial topic load
             var topics = await _dbContext._publisher
                         .Select(x => x.Topic)
                         .Distinct()
@@ -70,8 +75,30 @@ namespace LaundryCleaning.Services.Background
                     }
                     
                     _logger.LogInformation("Received message from topic {Topic}: {Value}", result.Topic, result.Message.Value);
-                    
-                    // Dispatch here ...
+
+                    // Dispatch
+                    var entity = new SystemReceived
+                    {
+                        Topic = result.Topic,
+                        Payload = result.Message.Value,
+                    };
+                    try
+                    {
+                        entity.IsProcessed = true;
+                        entity.ProcessedAt = DateTime.Now;
+
+                        await _dispatcher.DispatchAsync(result.Topic, result.Message.Value, cancellationToken);
+
+                        entity.ReceivedAt = DateTime.Now;
+                    }
+                    catch (Exception ex)
+                    {
+                        entity.ErrorMessage = ex.Message;
+                        _logger.LogError(ex, "Error dispatching message from topic {Topic}", result.Topic);
+                    }
+
+                    await _dbContext._received.AddAsync(entity, cancellationToken);
+                    await _dbContext.SaveChangesAsync();
 
                 }
                 catch (TaskCanceledException)
@@ -119,6 +146,10 @@ namespace LaundryCleaning.Services.Background
                     }
 
                     await Task.Delay(TimeSpan.FromSeconds(30), cancellationToken); // Check every 30s
+                }
+                catch (TaskCanceledException)
+                {
+                    _logger.LogInformation("MonitorTopicsAsync stopped gracefully.");
                 }
                 catch (Exception ex)
                 {

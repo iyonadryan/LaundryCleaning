@@ -60,7 +60,7 @@ namespace LaundryCleaning.Services.Implementations
             }
             catch (Exception ex)
             {
-                entity.ErrorMessage = "Unexpected Kafka produce error";
+                entity.ErrorMessage = ex.Message;
                 _logger.LogError(ex, "Unexpected Kafka produce error");
                 throw new BusinessLogicException("Unexpected Kafka produce error");
             }
