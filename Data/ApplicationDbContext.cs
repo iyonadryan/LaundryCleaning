@@ -19,6 +19,9 @@ namespace LaundryCleaning.Data
         }
 
         #region Entity
+        public DbSet<SystemPublisher> _publisher => Set<SystemPublisher>();
+        public DbSet<SystemReceived> _received => Set<SystemReceived>();
+
         public DbSet<Identity> Identities => Set<Identity>();
         public DbSet<InvoiceNumberTracker> InvoiceNumberTrackers => Set<InvoiceNumberTracker>();
         public DbSet<Role> Roles => Set<Role>();
@@ -32,6 +35,9 @@ namespace LaundryCleaning.Data
             base.OnModelCreating(modelBuilder);
 
             #region Entity Builder
+            new SystemPublisherBuilder(this).Configure(modelBuilder.Entity<SystemPublisher>());
+            new SystemReceivedBuilder(this).Configure(modelBuilder.Entity<SystemReceived>());
+
             new IdentityBuilder(this).Configure(modelBuilder.Entity<Identity>());
             new InvoiceNumberTrackerBuilder(this).Configure(modelBuilder.Entity<InvoiceNumberTracker>());
             new RoleBuilder(this).Configure(modelBuilder.Entity<Role>());

@@ -25,17 +25,20 @@ namespace LaundryCleaning.GraphQL.Users.Services.Implementations
         private readonly IPasswordService _passwordService;
         private readonly ITopicEventSender _topicEventSender;
         private readonly ILogger<UserService> _logger;
+        private readonly IPublisherService _publisherService;
 
         public UserService(
             ApplicationDbContext dbContext,
             IPasswordService passwordService,
             ITopicEventSender topicEventSender,
-            ILogger<UserService> logger)
+            ILogger<UserService> logger,
+            IPublisherService publisherService)
         {
             _dbContext = dbContext;
             _passwordService = passwordService;
             _topicEventSender = topicEventSender;
             _logger = logger;
+            _publisherService = publisherService;
         }
 
         public async Task<List<User>> GetUsers(CancellationToken cancellationToken)
@@ -81,6 +84,24 @@ namespace LaundryCleaning.GraphQL.Users.Services.Implementations
                 }
             };
             return response;
+        }
+
+        public async Task<string> SendUserNotification(string input, CancellationToken cancellationtoken) 
+        {
+            _logger.LogInformation("Start SendUserNotification");
+
+            var userNotification = new UserNotification
+            {
+                UserId = Guid.Parse("C0B3553A-5EE3-43C6-AD65-FF9FA34B3F66"),
+                Title = "New Message",
+                Message = input
+            };
+
+            // Publish
+            _logger.LogInformation("Start Publish SendUserNotification");
+            await _publisherService.PublishAsync(userNotification, cancellationtoken);
+
+            return "Send Notif Published";
         }
     }
 }

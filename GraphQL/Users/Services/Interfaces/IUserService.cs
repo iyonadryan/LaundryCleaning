@@ -8,5 +8,6 @@ namespace LaundryCleaning.GraphQL.Users.Services.Interfaces
     {
         Task<List<User>> GetUsers (CancellationToken cancellationToken);
         Task<CreateUserCustomModel> CreateUser(CreateUserInput input, CancellationToken cancellationToken);
+        Task<string> SendUserNotification(string input, CancellationToken cancellationtoken);
     }
 }

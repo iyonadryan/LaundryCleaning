@@ -11,9 +11,11 @@ using LaundryCleaning.GraphQL.Roles.Services.Implementations;
 using LaundryCleaning.GraphQL.Roles.Services.Interfaces;
 using LaundryCleaning.GraphQL.Users.Services.Implementations;
 using LaundryCleaning.GraphQL.Users.Services.Interfaces;
+using LaundryCleaning.Services.Background;
 using LaundryCleaning.Services.Implementations;
 using LaundryCleaning.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace LaundryCleaning.Extensions
 {
@@ -26,6 +28,8 @@ namespace LaundryCleaning.Extensions
             services.AddScoped<IInvoiceNumberService, InvoiceNumberService>();
             services.AddScoped<IPasswordHasher<object>, PasswordHasher<object>>();
             services.AddScoped<IPasswordService, PasswordService>();
+            services.AddScoped<IPublisherService, PublisherService>();
+            services.AddHostedService<ReceivedBackgroundService>();
             services.AddSingleton<SecureDownloadHelper>();
             #endregion
 

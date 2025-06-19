@@ -23,6 +23,7 @@ namespace LaundryCleaning.Security.Admin
         {
             bool dataUpdated = false;
 
+            // User
             if (!_dbContext.Users.Any(x => x.Id == (Guid.Parse("C0B3553A-5EE3-43C6-AD65-FF9FA34B3F66")))) 
             {
                 dataUpdated = true;
@@ -40,6 +41,7 @@ namespace LaundryCleaning.Security.Admin
                 _dbContext.Users.Add(newUser);
             }
 
+            // Identity
             if (!_dbContext.Identities.Any(x => x.Id == (Guid.Parse("13613846-4F25-42C1-9F37-DBC87C50C816"))))
             {
                 dataUpdated = true;
@@ -54,6 +56,8 @@ namespace LaundryCleaning.Security.Admin
                 _dbContext.Identities.Add(newIdentity);
             }
 
+            // Role Permission
+            #region Role Permission
             if (!_dbContext.RolePermissions.Any(x => x.Id == (Guid.Parse("5CEDE765-262F-4447-88F6-D8EB4BF85000"))))
             {
                 dataUpdated = true;
@@ -67,6 +71,21 @@ namespace LaundryCleaning.Security.Admin
 
                 _dbContext.RolePermissions.Add(newRolePermission);
             }
+            if (!_dbContext.RolePermissions.Any(x => x.Id == (Guid.Parse("5CEDE765-262F-4447-88F6-D8EB4BF85001"))))
+            {
+                dataUpdated = true;
+
+                var newRolePermission = new RolePermission()
+                {
+                    Id = Guid.Parse("5CEDE765-262F-4447-88F6-D8EB4BF85001"),
+                    RoleId = Guid.Parse("382254A2-2FEE-4F45-8A9F-68FBDBC07966"), // ITTeam
+                    Permission = PermissionConstants.UserManage
+                };
+
+                _dbContext.RolePermissions.Add(newRolePermission);
+            }
+
+            #endregion
 
             if (dataUpdated)
             {
